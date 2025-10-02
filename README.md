@@ -1,40 +1,190 @@
-# WellCrafted Plugin (ExileCore2)
+# WellCrafted Plugin v1.3.0
 
-A plugin for ExileCore2 that helps evaluate **Well of Souls** choices for waystones.  
-It maps visible modifiers → hidden outcomes, scores them using user profiles, and renders an overlay to make crafting decisions easier.
-Automation to come (hopefully).
+A modular ExileCore2 plugin for Path of Exile 2 that analyzes Well of Souls choices, maps visible modifiers to hidden outcomes, provides intelligent scoring with user-configurable profiles, and renders an overlay to help make optimal waystone crafting decisions.
+
+## Architecture Overview
+
+This plugin has been completely refactored from a monolithic single-file approach to a clean, modular architecture that follows separation of concerns principles. The new structure makes the codebase maintainable, extensible, and easier to debug.
+
+## File Structure
+
+```
+Plugins/Source/WellCrafted/
+├── WellCraftedPlugin.cs              # Main plugin entry point & lifecycle
+├── WellCrafted.csproj                # Project file
+├── README.md                         # This file
+│
+├── Settings/
+│   ├── WellCraftedSettings.cs        # Root settings configuration
+│   ├── ProfilesUiSettings.cs         # UI colors, thresholds, table sizing
+│   └── OverlaySettings.cs            # Overlay toggles, font size, position
+│
+├── Profiles/
+│   ├── ProfileModel.cs               # WeightProfile & ProfilesFile models
+│   ├── ProfilesStore.cs              # JSON load/save, schema migration
+│   └── ProfilesService.cs            # CRUD operations, active profile mgmt
+│
+├── Mapping/
+│   ├── HiddenMapping.cs              # Built-in mapping table + utilities
+│   └── HiddenMappingLoader.cs        # External JSON merge + diagnostics
+│
+├── Scoring/
+│   ├── ScoringRules.cs               # Core scoring algorithms & normalization
+│   └── ColorRules.cs                 # Color selection based on thresholds
+│
+├── UI/
+│   ├── PanelRoot.cs                  # Main window controller
+│   ├── ProfilesPanel.cs              # Profiles management UI
+│   └── Tables/
+│       └── WeightsTableRenderer.cs   # ImGui table rendering utilities
+│
+├── Overlay/
+│   └── OverlayRenderer.cs            # In-game overlay rendering
+│
+├── Diagnostics/
+│   └── Logger.cs                     # Centralized logging wrapper
+│
+└── Util/
+    ├── Guard.cs                      # Defensive programming utilities
+    ├── JsonUtil.cs                   # JSON serialization helpers
+    └── ImGuiHelpersEx.cs            # Safe ImGui wrapper patterns
+```
+
+## Core Features
+
+### 1. **Profile System**
+- Multiple user-configurable profiles with weight preferences
+- Per-panel multipliers for Default/Desecrated/Hidden modifiers
+- Schema versioning with automatic migration from v1 to v2
+- Profile CRUD operations (Create, Rename, Delete, Clone)
+- Automatic backup system (keeps 3 most recent)
+
+### 2. **Scoring System**
+- Weight range: -11 to +10 (where -11 = BANNED = negative infinity)
+- Sign-aware panel multipliers: `scaled = weight * (1 + multiplier * sign(weight))`
+- Hidden modifier aggregation (currently average, extensible for min/softmin)
+- Hard veto system: any banned modifier makes choice unpickable
+- Configurable color thresholds for visual feedback
+
+### 3. **Hidden Mapping**
+- Built-in mapping database for visible → hidden modifier relationships
+- External JSON file support for user customizations
+- Fuzzy matching with text normalization
+- Merge system: built-in ← seeds ← user (user has highest priority)
+- Real-time mapping editor with import/export capabilities
+
+### 4. **Overlay System**
+- Compact single-line display: `HiddenMods — Score`
+- Configurable positioning, text size, pixel snapping
+- Hover highlighting and optional visible text echo
+- Score badge with banned/numeric display
+- Debug rectangle visualization
+
+### 5. **UI Components**
+- Clean tabbed interface for Default/Desecrated/Hidden weights
+- Color-coded sliders with "Banned" display for -11 values
+- Row background coloring that matches overlay colors
+- Real-time score preview and threshold visualization
+- Appearance customization (colors, thresholds)
+
+## Key Design Principles
+
+### **Data Safety**
+- Never wipe user profiles during updates
+- Schema migration preserves existing data
+- Automatic backup system before saves
+- Defensive programming with null checks and fallbacks
+
+### **Scoring Consistency**
+- Same color logic used for overlay, sliders, and row backgrounds
+- All text normalization goes through single `ScoringRules.Normalize()` method
+- Banned logic (-11 = negative infinity) enforced consistently
+- Score thresholds user-configurable via settings
+
+### **Modularity**
+- Clear separation between data, business logic, and UI
+- Services communicate through well-defined interfaces
+- Easy to extend with new aggregation methods or automation features
+- Comprehensive error handling with graceful degradation
+
+### **Performance**
+- TimeCache for game state snapshots (100ms refresh)
+- Efficient text normalization with regex compilation
+- Minimal ImGui state management
+- Selective UI updates only when necessary
+
+## Configuration Files
+
+### **Profiles** (`WellCraftedProfiles.json`)
+```json
+{
+  "schema": 2,
+  "active": "Default",
+  "profiles": {
+    "Default": {
+      "visibleDefault": { "pack size": 2.0 },
+      "visibleDesecrated": { "abyss pits": 5.0 },
+      "hidden": { "map item quantity": 8.0 },
+      "multDefault": 0.0,
+      "multDesecrated": 0.0,
+      "multHidden": 0.0
+    }
+  }
+}
+```
+
+### **Hidden Mapping** (`data/HiddenMap.user.json`)
+```json
+{
+  "schema": 2,
+  "mappings": [
+    {
+      "match": "Abysses lead to an Abyssal Depths",
+      "hidden": ["+20% Map Item Drop Chance"]
+    }
+  ]
+}
+```
+
+## Future Extensions
+
+The architecture is designed to easily accommodate:
+
+- **Automation Module**: Hotkey-driven reroll automation with safety checks
+- **Advanced Aggregation**: Min, SoftMin(k), weighted average for hidden mods  
+- **CSV Export**: Current filtered view export for external analysis
+- **Test Harness**: Automated scoring invariant verification
+- **Plugin Bridge**: Integration with other ExileCore2 plugins
+
+## Development Guidelines
+
+### **Adding New Features**
+1. Follow the existing namespace structure
+2. Use dependency injection through constructors
+3. Implement proper error handling and logging
+4. Maintain data safety principles
+5. Write defensive code with null checks
+
+### **UI Development**
+1. Use `ImGuiHelpersEx` for safe Begin/End patterns  
+2. Handle exceptions gracefully in render loops
+3. Keep state management minimal and predictable
+4. Follow the color consistency rules
+
+### **Testing**
+1. Test schema migration paths thoroughly
+2. Verify scoring mathematics with edge cases
+3. Test profile CRUD operations under various conditions
+4. Validate JSON serialization/deserialization
+
+## Version History
+
+- **v1.3.0**: Complete architectural refactor to multi-file modular design
+- **v1.2.8**: Last stable monolithic version (baseline reference)
+- **v1.2.x**: Added panel multipliers, banned (-11) logic, schema v2
+- **v1.1.x**: Basic profile system, hidden mapping
+- **v1.0.x**: Initial overlay and scoring system
 
 ---
 
-## ✨ Features
-
-- **Overlay**
-  - Shows hidden mods and a score badge directly on the 3 waystone choices
-  - Configurable text size, position offsets, colors, and bubble background
-  - Optional echo of visible text
-  - Debug rectangles for developers
-
-- **Profiles**
-  - Multiple weight profiles (Default / Desecrated / Hidden)
-  - Adjustable weight sliders (−11 = *Banned*, +10 = *Max Favorable*)
-  - Color thresholds for red/white/green feedback
-  - Save / load profiles via JSON (`WellCraftedProfiles.json`)
-
-- **Hidden Mapping**
-  - Built-in database of visible → hidden mod mappings
-  - Supports user overrides via JSON (`HiddenMap.user.json`)
-  - Merge priority: Built-in < Seeds < User file
-  - Logs unmapped lines for easy contribution
-
-- **Settings**
-  - Toggle overlay hotkey (default **F7**)
-  - “Show Profiles Tab” toggle (enabled by default)
-  - “Show DevTree” toggle for advanced debugging
-  - Color and layout options under the Overlay submenu
-
-📜 Version History
-  - v1.3.0 — Modular refactor, overlay polish, profiles & mapping stable
-  - v1.2.8 — Last “monolithic” stable version
-  - v1.2.x — Added banned (−11) logic and panel multipliers
-  - v1.1.x — Early profile system and hidden mapping
-  - v1.0.x — Initial overlay
+**This plugin follows ExileCore2 conventions and maintains compatibility with the established WellCrafted feature set while providing a much cleaner, more maintainable codebase.**

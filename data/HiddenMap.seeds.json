@@ -1,0 +1,471 @@
+{
+  "schema": 2,
+  "mappings": [
+    {
+      "match": "Rare Monsters have # additional Modifier",
+      "hidden": [
+        "# increased Number of Rare Monsters",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Area contains # additional packs of Undead",
+      "hidden": [
+        "# increased Item Rarity",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Area contains # additional packs of Beasts",
+      "hidden": [
+        "# increased Pack Size",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Area contains # additional packs of Ezomyte Monsters",
+      "hidden": [
+        "# increased Pack Size",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Area contains # additional packs of Bramble Monsters",
+      "hidden": [
+        "# increased Pack Size",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Area contains # additional packs of Faridun Monsters",
+      "hidden": [
+        "# increased Item Rarity",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Area contains # additional packs of Plagued Monsters",
+      "hidden": [
+        "# increased Item Rarity",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Area contains # additional packs of Vaal Monsters",
+      "hidden": [
+        "# increased Number of Magic Monsters",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Area contains # additional packs of Iron Guards",
+      "hidden": [
+        "# increased Number of Rare Monsters",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Area contains # additional packs of Transcended Monsters",
+      "hidden": [
+        "# increased Number of Rare Monsters",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "# increased Magic Monsters",
+      "hidden": [
+        "# increased Number of Magic Monsters",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "# increased Rare Monsters",
+      "hidden": [
+        "# increased Number of Rare Monsters",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters deal Extra Fire Damage",
+      "hidden": [
+        "# increased Number of Magic Monsters",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters deal Extra Cold Damage",
+      "hidden": [
+        "# increased Item Rarity",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters deal Extra Lightning Damage",
+      "hidden": [
+        "# increased Pack Size",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters deal Extra Chaos Damage",
+      "hidden": [
+        "# increased Item Rarity",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters have increased Attack Speed",
+      "hidden": [
+        "# increased Pack Size",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters have increased Movement Speed",
+      "hidden": [
+        "# increased Pack Size",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters have increased Cast Speed",
+      "hidden": [
+        "# increased Pack Size",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters have increased Critical Hit Chance \u0026 Damage",
+      "hidden": [
+        "# increased Pack Size",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters have more Life",
+      "hidden": [
+        "# increased Number of Rare Monsters",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters gain Elemental Resistances",
+      "hidden": [
+        "# increased Item Rarity",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters are Armoured",
+      "hidden": [
+        "# increased Number of Rare Monsters",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters are Evasive",
+      "hidden": [
+        "# increased Pack Size",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters gain Energy Shield",
+      "hidden": [
+        "# increased Item Rarity",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters have chance to Poison on Hit",
+      "hidden": [
+        "# increased Pack Size",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters have chance to inflict Bleeding on Hit",
+      "hidden": [
+        "# increased Number of Magic Monsters",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters have increased Ailment Threshold",
+      "hidden": [
+        "# increased Number of Magic Monsters",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters have increased Stun Threshold",
+      "hidden": [
+        "# increased Number of Magic Monsters",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters Break Armour on Hit",
+      "hidden": [
+        "# increased Number of Rare Monsters",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters have increased Accuracy Rating",
+      "hidden": [
+        "# increased Pack Size",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters have increased Stun Buildup",
+      "hidden": [
+        "# increased Number of Magic Monsters",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters have increased Freeze Buildup",
+      "hidden": [
+        "# increased Item Rarity",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters have increased Shock Chance",
+      "hidden": [
+        "# increased Item Rarity",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters inflict increased Flammability Magnitude",
+      "hidden": [
+        "# increased Item Rarity",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters fire additional Projectiles",
+      "hidden": [
+        "# increased Pack Size",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Players are periodically Cursed with Enfeeble",
+      "hidden": [
+        "# increased Number of Magic Monsters",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Players are periodically Cursed with Temporal Chains",
+      "hidden": [
+        "# increased Pack Size",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Players are periodically Cursed with Elemental Weakness",
+      "hidden": [
+        "# increased Item Rarity",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Area has patches of Ignited Ground",
+      "hidden": [
+        "# increased Number of Magic Monsters",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Area has patches of Chilled Ground",
+      "hidden": [
+        "# increased Item Rarity",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Area has patches of Shocked Ground",
+      "hidden": [
+        "# increased Pack Size",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monster Damage Penetrates Elemental Resistances",
+      "hidden": [
+        "# increased Item Rarity",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Players have reduced Maximum Resistances",
+      "hidden": [
+        "# increased Pack Size",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Players gain reduced Flask Charges",
+      "hidden": [
+        "# increased Pack Size",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Players have less Recovery Rate of Life and ES",
+      "hidden": [
+        "# increased Item Rarity",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Players have less Cooldown Recovery Rate",
+      "hidden": [
+        "# increased Item Rarity",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters take reduced Extra Damage from Crits",
+      "hidden": [
+        "# increased Number of Rare Monsters",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters have reduced Effect of Curses",
+      "hidden": [
+        "# increased Item Rarity",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Monsters steal Charges on Hit",
+      "hidden": [
+        "# increased Pack Size",
+        "# increased Waystones found"
+      ]
+    },
+    {
+      "match": "Abyssal Monsters grant # increased Experience",
+      "hidden": [
+        "# increased Pack Size"
+      ]
+    },
+    {
+      "match": "Abysses have # additional Pits",
+      "hidden": [
+        "# increased Item Rarity"
+      ]
+    },
+    {
+      "match": "Abysses in Area spawn # increased Monsters",
+      "hidden": [
+        "# increased Pack Size"
+      ]
+    },
+    {
+      "match": "Abysses have # additional Pits Area is overrun by the Abyssal",
+      "hidden": [
+        "# increased Pack Size"
+      ]
+    },
+    {
+      "match": "Abysses lead to an Abyssal Boss",
+      "hidden": [
+        "# increased Item Rarity"
+      ]
+    },
+    {
+      "match": "Area contains an additional Incubator Queen",
+      "hidden": [
+        "# increased Pack Size"
+      ]
+    },
+    {
+      "match": "Abyss Pits have # chance to spawn all Monsters as at least Magic; Abyss Cracks have # chance to spawn all Monsters as at least Magic",
+      "hidden": [
+        "# increased Number of Magic Monsters"
+      ]
+    },
+    {
+      "match": "Abysses lead to an Abyssal Depths",
+      "hidden": [
+        "# increased Item Rarity"
+      ]
+    },
+    {
+      "match": "Monsters from Abysses have increased Difficulty and Reward for each closed Pit in that Abyss",
+      "hidden": [
+        "# increased Pack Size"
+      ]
+    },
+    {
+      "match": "Abyss Pits in Area always have Rewards",
+      "hidden": [
+        "# increased Number of Magic Monsters",
+        "# increased Number of Rare Monsters"
+      ]
+    },
+    {
+      "match": "Natural Rare Monsters in Area have # extra Abyssal Modifier",
+      "hidden": [
+        "# increased Number of Rare Monsters"
+      ]
+    },
+    {
+      "match": "Natural Rare Monsters in Area Eat the Souls of slain Monsters in their Presence; Players steal the Eaten Souls of Slain Rare Monsters in Area",
+      "hidden": [
+        "# increased Pack Size"
+      ]
+    },
+    {
+      "match": "Players and their Minions deal no damage for 3 out of every 10 seconds",
+      "hidden": [
+        "# increased Number of Rare Monsters"
+      ]
+    },
+    {
+      "match": "Players have # less Movement and Skill Speed for each time they\u0027ve used a Skill Recently",
+      "hidden": [
+        "# increased Item Rarity"
+      ]
+    },
+    {
+      "match": "Monsters inflict 1 Grasping Vine on Hit",
+      "hidden": [
+        "# increased Pack Size"
+      ]
+    },
+    {
+      "match": "Players are Marked for Death for 10 seconds after killing a Rare or Unique monster",
+      "hidden": [
+        "# increased Item Rarity",
+        "# increased Pack Size"
+      ]
+    },
+    {
+      "match": "Area has patches of Mana Siphoning Ground",
+      "hidden": [
+        "# increased Pack Size"
+      ]
+    },
+    {
+      "match": "Natural Monster Packs in Area are in a Union of Souls",
+      "hidden": [
+        "# increased Pack Size"
+      ]
+    },
+    {
+      "match": "Natural Rare Monsters in Area are in a Union of Souls with the Map Boss",
+      "hidden": [
+        "# increased Number of Rare Monsters"
+      ]
+    }
+  ]
+}
