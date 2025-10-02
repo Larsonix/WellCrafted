@@ -1,4 +1,4 @@
-# WellCrafted Plugin (ExileCore2 / PoE2)
+# WellCrafted Plugin (ExileCore2)
 
 A plugin for ExileCore2 that helps evaluate **Well of Souls** choices for waystones.  
 It maps visible modifiers → hidden outcomes, scores them using user profiles, and renders an overlay to make crafting decisions easier.
