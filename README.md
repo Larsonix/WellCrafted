@@ -156,27 +156,6 @@ The architecture is designed to easily accommodate:
 - **Test Harness**: Automated scoring invariant verification
 - **Plugin Bridge**: Integration with other ExileCore2 plugins
 
-## Development Guidelines
-
-### **Adding New Features**
-1. Follow the existing namespace structure
-2. Use dependency injection through constructors
-3. Implement proper error handling and logging
-4. Maintain data safety principles
-5. Write defensive code with null checks
-
-### **UI Development**
-1. Use `ImGuiHelpersEx` for safe Begin/End patterns  
-2. Handle exceptions gracefully in render loops
-3. Keep state management minimal and predictable
-4. Follow the color consistency rules
-
-### **Testing**
-1. Test schema migration paths thoroughly
-2. Verify scoring mathematics with edge cases
-3. Test profile CRUD operations under various conditions
-4. Validate JSON serialization/deserialization
-
 ## Version History
 
 - **v1.3.0**: Complete architectural refactor to multi-file modular design
@@ -184,7 +163,3 @@ The architecture is designed to easily accommodate:
 - **v1.2.x**: Added panel multipliers, banned (-11) logic, schema v2
 - **v1.1.x**: Basic profile system, hidden mapping
 - **v1.0.x**: Initial overlay and scoring system
-
----
-
-**This plugin follows ExileCore2 conventions and maintains compatibility with the established WellCrafted feature set while providing a much cleaner, more maintainable codebase.**
