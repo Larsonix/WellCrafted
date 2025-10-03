@@ -3,6 +3,7 @@
 // Hidden mods + score badge + visible echo (draw-list; tidy bubbles)
 // Adds: choices-panel generation tracking + 3s grace window (configurable)
 //       + strict rectangle validity checks to avoid (0,0,0,0) flicker
+//       + FAVORITE badge (weight=+11) overriding all checks
 // ===============================================
 
 using System;
@@ -42,10 +43,9 @@ namespace WellCrafted.Overlay
 
         public void RenderOverlay(GameSnapshot snapshot)
         {
-            // Guard: only draw when the Well panel is actually present
             if (snapshot == null || !snapshot.RootOk) return;
 
-            // Pre-read rectangles and validate them (avoid (0,0,0,0) flicker).
+            // Pre-read rectangles & validity
             var rects = new ExileCore2.Shared.RectangleF?[3];
             bool[] rectValid = new bool[3];
             for (int i = 0; i < 3; i++)
@@ -56,13 +56,11 @@ namespace WellCrafted.Overlay
             }
             bool anyRectValid = rectValid[0] || rectValid[1] || rectValid[2];
 
-            // Determine current visibility of the 3-choices panel.
-            // We require an actually valid rect on at least one lane.
+            // Panel visible = any lane visible + at least one valid rect
             bool lanesVisible = snapshot.ChoiceVisible[0] || snapshot.ChoiceVisible[1] || snapshot.ChoiceVisible[2];
             bool panelVisible = lanesVisible && anyRectValid;
 
-            // Build a generation key from the three choice rectangles (robust even when text lags).
-            // Use only valid rects; invalid ones contribute zero so they don't thrash the key.
+            // Generation key from rects
             ulong a = rectValid[0] ? PackRect(rects[0]!.Value) : 0UL;
             ulong b = rectValid[1] ? PackRect(rects[1]!.Value) : 0UL;
             ulong c = rectValid[2] ? PackRect(rects[2]!.Value) : 0UL;
@@ -73,11 +71,8 @@ namespace WellCrafted.Overlay
             {
                 if (!_wasVisible || genKey != _lastGenKey)
                 {
-                    // Panel (re)opened or rebuilt: start/refresh grace window
                     _graceUntilMs = now + Math.Max(0, _settings.ChoicesGraceMs?.Value ?? 3000);
                     _lastGenKey = genKey;
-
-                    // reset one-shot unknowns for a clean run on new generation
                     _loggedUnknown.Clear();
                 }
             }
@@ -90,13 +85,13 @@ namespace WellCrafted.Overlay
             var profile = _profiles.GetActiveProfile();
             var dl = ImGui.GetForegroundDrawList();
 
-            // During grace: relax the text presence gate. After grace: require at least some text.
+            // During grace: relax text gate; after grace: require some text
             bool anyText = (snapshot.ChoiceTextOk[0] || snapshot.ChoiceTextOk[1] || snapshot.ChoiceTextOk[2]);
             if (!inGrace && !anyText) return;
 
             for (int i = 0; i < 3; i++)
             {
-                if (!rectValid[i]) continue; // skip invalid targets entirely
+                if (!rectValid[i]) continue;
 
                 var rect = rects[i]!.Value;
 
@@ -117,7 +112,6 @@ namespace WellCrafted.Overlay
 
                 if (hiddenLines == null || hiddenLines.Count == 0)
                 {
-                    // Optional one-shot debug for unmapped visible lines
                     if (_settings.LogUnknownHidden.Value)
                     {
                         var key = ScoringRules.Normalize(visible);
@@ -125,8 +119,8 @@ namespace WellCrafted.Overlay
                             Logger.Debug($"Unknown hidden for visible: \"{visible}\" (norm:\"{key}\")");
                     }
 
-                    // In grace, show a placeholder line to keep layout stable even if text hasn't appeared yet
-                    if (inGrace || !string.IsNullOrWhiteSpace(visible))
+                    // Draw the placeholder only AFTER the grace window has elapsed
+                    if (!inGrace && !string.IsNullOrWhiteSpace(visible))
                     {
                         DrawBubbleText(dl, new(baseX, lineY), "No mod  (0.0)", _settings.ProfilesUI.MidWeightColor.Value);
                         lineY += _settings.Overlay.TextSize.Value;
@@ -148,20 +142,30 @@ namespace WellCrafted.Overlay
                 var wDef = ScoringRules.GetWeight(profile.VisibleDefault, visible);
                 var wDes = ScoringRules.GetWeight(profile.VisibleDesecrated, visible);
 
-                if (ScoringRules.IsWeightBanned(wDef) || ScoringRules.IsWeightBanned(wDes) ||
-                    (weightsHidden.Any() && weightsHidden.Any(ScoringRules.IsWeightBanned)))
+                // FAVORITE overrides everything (shows yellow badge)
+                bool anyFavorite = ScoringRules.IsWeightFavorite(wDef)
+                                   || ScoringRules.IsWeightFavorite(wDes)
+                                   || (weightsHidden.Any() && weightsHidden.Any(ScoringRules.IsWeightFavorite));
+                if (anyFavorite)
+                {
+                    DrawBadge(dl, rect, ScoringRules.FAVORITE_SCORE, "FAVORITE");
+                }
+                else if (ScoringRules.IsWeightBanned(wDef) || ScoringRules.IsWeightBanned(wDes) ||
+                         (weightsHidden.Any() && weightsHidden.Any(ScoringRules.IsWeightBanned)))
                 {
                     DrawBadge(dl, rect, ScoringRules.BANNED_SCORE, "BANNED");
                 }
                 else
                 {
                     var total = ScoringRules.CombinePanelScores(wDef, wDes, weightsHidden, profile);
-                    DrawBadge(dl, rect, total, total.ToString("0.0"));
+                    var text = ScoringRules.IsScoreFavorite(total) ? "FAVORITE" :
+                               ScoringRules.IsScoreBanned(total)   ? "BANNED"   :
+                               total.ToString("0.0");
+                    DrawBadge(dl, rect, total, text);
                 }
 
                 if (_settings.Overlay.ShowVisibleEcho.Value && (inGrace || !string.IsNullOrWhiteSpace(visible)))
                 {
-                    // In grace, allow empty echo area (fills as text arrives)
                     var echo = string.IsNullOrWhiteSpace(visible) ? "" : visible;
                     DrawBubbleText(dl, new(baseX, lineY), echo, _settings.ProfilesUI.MidWeightColor.Value);
                 }
@@ -172,7 +176,6 @@ namespace WellCrafted.Overlay
         {
             if (rOpt == null) return false;
             var r = rOpt.Value;
-            // Treat tiny or zero rects as invalid; also guard negative sizes.
             return r.Width > 8 && r.Height > 8;
         }
 
@@ -188,7 +191,6 @@ namespace WellCrafted.Overlay
             }
         }
 
-        // score-aware badge
         private void DrawBadge(ImDrawListPtr dl, ExileCore2.Shared.RectangleF rect, float score, string text)
         {
             if (!_settings.Overlay.ShowScoreBadge.Value) return;
@@ -202,9 +204,8 @@ namespace WellCrafted.Overlay
             DrawBubbleText(dl, pos, text, col);
         }
 
-        // Overload: ColorNode → packed
         private void DrawBubbleText(ImDrawListPtr dl, Vector2 pos, string text, System.Drawing.Color color)
-            => DrawBubbleText(dl, pos, text, ToU32(color));
+            => DrawBubbleText(dl, pos, text, ColorRules.ToU32(color));
 
         private void DrawBubbleText(ImDrawListPtr dl, Vector2 pos, string text, uint packed)
         {
@@ -224,7 +225,7 @@ namespace WellCrafted.Overlay
                 var padY = _settings.Overlay.BubblePadY.Value;
                 var r    = _settings.Overlay.BubbleRoundness.Value;
 
-                var bg = ToU32(_settings.Overlay.BubbleBgColor.Value);
+                var bg = ColorRules.ToU32(_settings.Overlay.BubbleBgColor.Value);
                 dl.AddRectFilled(new(pos.X - padX, pos.Y - padY), new(pos.X + size.X + padX, pos.Y + size.Y + padY), bg, r);
             }
 

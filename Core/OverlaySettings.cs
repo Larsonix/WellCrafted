@@ -12,19 +12,19 @@ namespace WellCrafted.Settings
     {
         // ── Text & position ───────────────────────────────────────────────────
         [Menu(null, "Hidden text nominal height (line spacing, px)")]
-        public RangeNode<int> TextSize { get; set; } = new RangeNode<int>(25, 12, 48); // 25
+        public RangeNode<int> TextSize { get; set; } = new RangeNode<int>(18, 1, 50); // 25
 
         [Menu(null, "Hidden Offset X (px)")]
-        public RangeNode<int> HiddenOffsetX { get; set; } = new RangeNode<int>(15, -800, 800); // 15
+        public RangeNode<int> HiddenOffsetX { get; set; } = new RangeNode<int>(4, -800, 800); // 15
 
         [Menu(null, "Hidden Offset Y (px)")]
-        public RangeNode<int> HiddenOffsetY { get; set; } = new RangeNode<int>(0, -800, 800); // 0
+        public RangeNode<int> HiddenOffsetY { get; set; } = new RangeNode<int>(-4, -800, 800); // 0
 
         [Menu(null, "Badge Offset X (px)")]
-        public RangeNode<int> BadgeOffsetX { get; set; } = new RangeNode<int>(645, -800, 800); // 645
+        public RangeNode<int> BadgeOffsetX { get; set; } = new RangeNode<int>(626, -800, 800); // 645
 
         [Menu(null, "Badge Offset Y (px)")]
-        public RangeNode<int> BadgeOffsetY { get; set; } = new RangeNode<int>(-10, -800, 800); // -10
+        public RangeNode<int> BadgeOffsetY { get; set; } = new RangeNode<int>(-9, -800, 800); // -10
 
         [Menu(null, "Label Y Offset (px)")]
         public RangeNode<int> LabelYOffset { get; set; } = new RangeNode<int>(-30, -100, 200); // -30
@@ -37,7 +37,7 @@ namespace WellCrafted.Settings
         public ToggleNode ShowVisibleEcho { get; set; } = new ToggleNode(false);
 
         [Menu(null, "Snap text position to pixels (sharper)")]
-        public ToggleNode PixelSnap { get; set; } = new ToggleNode(true); // checked
+        public ToggleNode PixelSnap { get; set; } = new ToggleNode(false);
 
         [Menu(null, "Avoid overlapping the game text (force below)")]
         public ToggleNode AvoidOverlap { get; set; } = new ToggleNode(false);
@@ -62,6 +62,6 @@ namespace WellCrafted.Settings
         public RangeNode<int> BubblePadX { get; set; } = new RangeNode<int>(6, 0, 20); // 6
 
         [Menu(null, "Bubble padding Y (px)")]
-        public RangeNode<int> BubblePadY { get; set; } = new RangeNode<int>(8, 0, 12); // 8 (assumed your “A” meant 8)
+        public RangeNode<int> BubblePadY { get; set; } = new RangeNode<int>(1, 0, 12); // 8 (assumed your “A” meant 8)
     }
 }

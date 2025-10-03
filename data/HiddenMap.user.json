@@ -1,4 +1,30 @@
 {
-  "Schema": 2,
-  "Mappings": []
+  "schema": 2,
+  "profiles": {
+    "Default": {
+      "visibleDefault": {},
+      "visibleDesecrated": {
+        "area is overrun by the abyssal": 11,
+        "abysses have # additional pits": 5,
+        "abyss pits in area always have rewards": 5,
+        "natural rare monsters in area have # extra abyssal modifier": 3,
+        "players and their minions deal no damage for # out of every # seconds": -11,
+        "players have # less movement and skill speed for each time they ve used a skill recently": -11,
+        "abysses in area spawn # increased monsters": 3,
+        "abysses lead to an abyssal boss": 3,
+        "area contains an additional incubator queen": 5,
+        "abysses lead to an abyssal depths": 3,
+        "monsters from abysses have increased difficulty and reward for each closed pit in that abyss": 3
+      },
+      "hidden": {
+        "# increased item rarity": 2,
+        "# increased pack size": 7,
+        "# increased number of rare monsters": 10
+      },
+      "multDefault": 0,
+      "multDesecrated": 0,
+      "multHidden": 0
+    }
+  },
+  "active": "Default"
 }

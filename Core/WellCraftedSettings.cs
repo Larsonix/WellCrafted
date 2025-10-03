@@ -34,9 +34,8 @@ namespace WellCrafted.Settings
         [Menu(null, "Show Profiles Tab")]
         public ToggleNode ShowProfilesTab => ProfilesUI.ShowProfilesTab; // default true
 
-        // Diagnostics container (kept for your panel logic; not rendered here)
+        // Profiles UI object is hidden; expose only the toggle
         public DiagnosticsSettings Diagnostics { get; set; } = new DiagnosticsSettings();
-// DevTree data (hidden; your UI can use it if needed)
 
         [Menu(null, "Show Diagnostics")]
         public ToggleNode ShowDiagnostics => Diagnostics.ShowDiagnosticsTab;

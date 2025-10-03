@@ -25,7 +25,7 @@ namespace WellCrafted.UI.Tables
 
         public void RenderWeightsTable(string category, List<string> modifiers)
         {
-            ImGui.Text($"{category} Weights (-11=BANNED, -10..+10; step 1)");
+            ImGui.Text($"{category} Weights (-11=BANNED, -10..+11; step 1)");
 
             var flags = ImGuiTableFlags.RowBg | ImGuiTableFlags.BordersInnerV |
                         ImGuiTableFlags.ScrollY | ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingStretchProp;
@@ -66,13 +66,17 @@ namespace WellCrafted.UI.Tables
             ImGui.TableSetColumnIndex(1);
             ImGui.PushID($"{category}_{normKey}");
 
-            int v = (int)Math.Clamp(Math.Round(cur), ScoringRules.BANNED_WEIGHT, 10);
+            int v = (int)Math.Clamp(Math.Round(cur), ScoringRules.BANNED_WEIGHT, ScoringRules.FAVORITE_WEIGHT);
             ImGui.PushStyleColor(ImGuiCol.Text, ColorRules.GetSliderColor(v, _settings.ProfilesUI));
 
-            string fmt = ScoringRules.IsWeightBanned(v) ? "Banned" : "%d";
-            if (ImGui.SliderInt("##w", ref v, ScoringRules.BANNED_WEIGHT, 10, fmt, ImGuiSliderFlags.AlwaysClamp))
+            string fmt =
+                ScoringRules.IsWeightBanned(v)   ? "Banned"   :
+                ScoringRules.IsWeightFavorite(v) ? "Favorite" :
+                "%d";
+
+            if (ImGui.SliderInt("##w", ref v, ScoringRules.BANNED_WEIGHT, ScoringRules.FAVORITE_WEIGHT, fmt, ImGuiSliderFlags.AlwaysClamp))
             {
-                // Edit only in memory to avoid snap; user saves explicitly
+                // Edit only in memory; user explicitly saves
                 _profiles.UpdateWeight(category, normKey, v, save: false);
             }
 

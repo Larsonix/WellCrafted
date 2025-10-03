@@ -1,9 +1,15 @@
-# WellCrafted Plugin v1.7.2
+# WellCrafted Plugin v1.8.0
 
 An ExileCore2 plugin that analyzes Well of Souls choices, maps visible modifiers to hidden outcomes, provides intelligent scoring with user-configurable profiles, and renders an overlay to help make optimal waystone crafting decisions.
 
 
-## New features in 1.7.2 (since 1.6.3)
+## New features in 1.8.0 (since 1.6.3)
+
+- **Favorite weights (NEW)**  
+  - Add `+11 = Favorite` for any weight (Visible: Default/Desecrated, or Hidden).  
+  - Favorites **override everything** (including Banned) and render a **yellow `FAVORITE`** badge on the overlay.  
+  - Sliders now support **-11..+11**; when set to `+11` they display **“Favorite”** and use the Favorite color.  
+  - New UI color: **FavoriteWeightColor** (default warm yellow) in Profiles → Appearance.
 
 - **Robust choice panel detection**  
   - Overlay now gates strictly on the actual 3-choices panel visibility (no longer inferred from Reveal button).  
@@ -56,13 +62,27 @@ An ExileCore2 plugin that analyzes Well of Souls choices, maps visible modifiers
 
 ## Version History
 
+### 1.8.0
+- Favorite weight added: +11 shows a yellow FAVORITE badge and overrides all other checks (including BANNED).
+- Sliders expanded to -11..+11 with textual labels (Banned, Favorite) and proper colors.
+- Profiles UI adds FavoriteWeightColor (default warm yellow).
+
+### 1.7.5
+- Generalized “overrun …” handling: any visible line containing overrun resolves to the canonical “Area is overrun by the Abyssal/Abyss” slider value.
+- Ensures future wording drift still maps to the configured slider.
+
+### 1.7.4
+- Weight lookups hardened: profile/dictionary paths both apply the overrun canonicalization before scoring.
+
+### 1.7.3
+- Fixed the “Area is overrun by the Abyssal” slider not affecting the overlay when the UI showed “…Abyss”; introduced an alias so both variants map to the same key.
+
 ### 1.7.2
 - Added strict rectangle validity checks to eliminate flicker.
-
+- Choice panel detection, generation tracking, and 3s grace window for fast Confirm→Reveal cycles.
 
 ### 1.7.1
 - Improved grace handling and overlay stability during rapid clicks.
-
 
 ### 1.7.0
 - Panel visibility now keyed to actual 3-choices container.

@@ -123,7 +123,7 @@ namespace WellCrafted.UI
 
         private void RenderPanelMultipliers()
         {
-            ImGui.Text("Panel bias (−1..+1). Center = neutral; right favors positives / mutes negatives; left favors negatives / mutes positives.");
+            ImGui.Text("Center = Neutral | Right = Positive | Left = Negative");
 
             var p = _profilesService.GetActiveProfile();
 
