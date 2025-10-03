@@ -1,5 +1,6 @@
 // ===============================================
 // Settings/WellCraftedSettings.cs — ordered menu
+// Adds: ChoicesGraceMs timing knob
 // ===============================================
 
 using System.Windows.Forms;
@@ -41,6 +42,10 @@ namespace WellCrafted.Settings
         public ToggleNode ShowDiagnostics => Diagnostics.ShowDiagnosticsTab;
 
         public DevTreeSettings DevTree { get; set; } = new DevTreeSettings();
+
+        // ── Timings ─────────────────────────────────────────────────────────
+        [Menu("Grace window (ms)", "Relaxed gating after panel rebuild (0–10000 ms)")]
+        public RangeNode<int> ChoicesGraceMs { get; set; } = new RangeNode<int>(3000, 0, 10000);
     }
 
     // Kept hidden; used only by your own panel if needed

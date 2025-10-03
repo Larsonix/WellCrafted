@@ -1,6 +1,8 @@
 // ===============================================
 // UI/Overlay/OverlayRenderer.cs
 // Hidden mods + score badge + visible echo (draw-list; tidy bubbles)
+// Adds: choices-panel generation tracking + 3s grace window (configurable)
+//       + strict rectangle validity checks to avoid (0,0,0,0) flicker
 // ===============================================
 
 using System;
@@ -23,6 +25,11 @@ namespace WellCrafted.Overlay
         private readonly HiddenMappingLoader _loader;
         private readonly ProfilesService _profiles;
 
+        // Panel visibility/generation + grace
+        private bool _wasVisible;
+        private ulong _lastGenKey;
+        private long _graceUntilMs;
+
         // Log "unknown hidden" once per normalized visible line (if enabled)
         private readonly HashSet<string> _loggedUnknown = new(StringComparer.OrdinalIgnoreCase);
 
@@ -37,19 +44,61 @@ namespace WellCrafted.Overlay
         {
             // Guard: only draw when the Well panel is actually present
             if (snapshot == null || !snapshot.RootOk) return;
-            if (!(snapshot.ChoiceVisible[0] || snapshot.ChoiceVisible[1] || snapshot.ChoiceVisible[2])) return;
-            if (!(snapshot.ChoiceTextOk[0] || snapshot.ChoiceTextOk[1] || snapshot.ChoiceTextOk[2])) return;
+
+            // Pre-read rectangles and validate them (avoid (0,0,0,0) flicker).
+            var rects = new ExileCore2.Shared.RectangleF?[3];
+            bool[] rectValid = new bool[3];
+            for (int i = 0; i < 3; i++)
+            {
+                var ropt = Guard.GetSafeRect(snapshot.Choices[i]);
+                rects[i] = ropt;
+                rectValid[i] = IsRectValid(ropt);
+            }
+            bool anyRectValid = rectValid[0] || rectValid[1] || rectValid[2];
+
+            // Determine current visibility of the 3-choices panel.
+            // We require an actually valid rect on at least one lane.
+            bool lanesVisible = snapshot.ChoiceVisible[0] || snapshot.ChoiceVisible[1] || snapshot.ChoiceVisible[2];
+            bool panelVisible = lanesVisible && anyRectValid;
+
+            // Build a generation key from the three choice rectangles (robust even when text lags).
+            // Use only valid rects; invalid ones contribute zero so they don't thrash the key.
+            ulong a = rectValid[0] ? PackRect(rects[0]!.Value) : 0UL;
+            ulong b = rectValid[1] ? PackRect(rects[1]!.Value) : 0UL;
+            ulong c = rectValid[2] ? PackRect(rects[2]!.Value) : 0UL;
+            ulong genKey = Mix(a, b, c);
+
+            long now = Environment.TickCount64;
+            if (panelVisible)
+            {
+                if (!_wasVisible || genKey != _lastGenKey)
+                {
+                    // Panel (re)opened or rebuilt: start/refresh grace window
+                    _graceUntilMs = now + Math.Max(0, _settings.ChoicesGraceMs?.Value ?? 3000);
+                    _lastGenKey = genKey;
+
+                    // reset one-shot unknowns for a clean run on new generation
+                    _loggedUnknown.Clear();
+                }
+            }
+            _wasVisible = panelVisible;
+
+            if (!panelVisible) return;
+
+            bool inGrace = now < _graceUntilMs;
 
             var profile = _profiles.GetActiveProfile();
             var dl = ImGui.GetForegroundDrawList();
 
+            // During grace: relax the text presence gate. After grace: require at least some text.
+            bool anyText = (snapshot.ChoiceTextOk[0] || snapshot.ChoiceTextOk[1] || snapshot.ChoiceTextOk[2]);
+            if (!inGrace && !anyText) return;
+
             for (int i = 0; i < 3; i++)
             {
-                var choice = snapshot.Choices[i];
-                var rectOpt = Guard.GetSafeRect(choice);
-                if (rectOpt == null) continue;
+                if (!rectValid[i]) continue; // skip invalid targets entirely
 
-                var rect = rectOpt.Value;
+                var rect = rects[i]!.Value;
 
                 if (_settings.Overlay.DrawDebugRects.Value)
                 {
@@ -76,8 +125,12 @@ namespace WellCrafted.Overlay
                             Logger.Debug($"Unknown hidden for visible: \"{visible}\" (norm:\"{key}\")");
                     }
 
-                    DrawBubbleText(dl, new(baseX, lineY), "No mod  (0.0)", _settings.ProfilesUI.MidWeightColor.Value);
-                    lineY += _settings.Overlay.TextSize.Value;
+                    // In grace, show a placeholder line to keep layout stable even if text hasn't appeared yet
+                    if (inGrace || !string.IsNullOrWhiteSpace(visible))
+                    {
+                        DrawBubbleText(dl, new(baseX, lineY), "No mod  (0.0)", _settings.ProfilesUI.MidWeightColor.Value);
+                        lineY += _settings.Overlay.TextSize.Value;
+                    }
                 }
                 else
                 {
@@ -106,10 +159,32 @@ namespace WellCrafted.Overlay
                     DrawBadge(dl, rect, total, total.ToString("0.0"));
                 }
 
-                if (_settings.Overlay.ShowVisibleEcho.Value && !string.IsNullOrWhiteSpace(visible))
+                if (_settings.Overlay.ShowVisibleEcho.Value && (inGrace || !string.IsNullOrWhiteSpace(visible)))
                 {
-                    DrawBubbleText(dl, new(baseX, lineY), visible, _settings.ProfilesUI.MidWeightColor.Value);
+                    // In grace, allow empty echo area (fills as text arrives)
+                    var echo = string.IsNullOrWhiteSpace(visible) ? "" : visible;
+                    DrawBubbleText(dl, new(baseX, lineY), echo, _settings.ProfilesUI.MidWeightColor.Value);
                 }
+            }
+        }
+
+        private static bool IsRectValid(ExileCore2.Shared.RectangleF? rOpt)
+        {
+            if (rOpt == null) return false;
+            var r = rOpt.Value;
+            // Treat tiny or zero rects as invalid; also guard negative sizes.
+            return r.Width > 8 && r.Height > 8;
+        }
+
+        private static ulong PackRect(ExileCore2.Shared.RectangleF r)
+        {
+            unchecked
+            {
+                ulong x = (ulong)(long)Math.Round(r.X) & 0xFFFFUL;
+                ulong y = (ulong)(long)Math.Round(r.Y) & 0xFFFFUL;
+                ulong w = (ulong)(long)Math.Round(r.Width) & 0xFFFFUL;
+                ulong h = (ulong)(long)Math.Round(r.Height) & 0xFFFFUL;
+                return x | (y << 16) | (w << 32) | (h << 48);
             }
         }
 
@@ -133,6 +208,8 @@ namespace WellCrafted.Overlay
 
         private void DrawBubbleText(ImDrawListPtr dl, Vector2 pos, string text, uint packed)
         {
+            if (string.IsNullOrEmpty(text)) return;
+
             if (_settings.Overlay.PixelSnap.Value)
             {
                 pos.X = MathF.Round(pos.X);
@@ -158,6 +235,15 @@ namespace WellCrafted.Overlay
         {
             var v = new Vector4(c.R/255f, c.G/255f, c.B/255f, c.A/255f);
             return ImGui.ColorConvertFloat4ToU32(v);
+        }
+
+        private static ulong Mix(ulong a, ulong b, ulong c)
+        {
+            ulong x = 0x9E3779B97F4A7C15UL;
+            x ^= a + (x << 6) + (x >> 2);
+            x ^= b + (x << 6) + (x >> 2);
+            x ^= c + (x << 6) + (x >> 2);
+            return x;
         }
     }
 }

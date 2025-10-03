@@ -370,7 +370,7 @@
       ]
     },
     {
-      "match": "Abysses have # additional Pits Area is overrun by the Abyssal",
+      "match": "Abysses have 1# additional Pits; Area is overrun by the Abyssal",
       "hidden": [
         "# increased Pack Size"
       ]

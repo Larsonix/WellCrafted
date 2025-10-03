@@ -65,6 +65,9 @@ public static string Normalize(string s)
     // Canonicalize numbers/percents to '#'
     src = System.Text.RegularExpressions.Regex.Replace(src, @"\d+([.,]\d+)?", "#");
 
+    // NEW: collapse multi-# so seeds like '1#' normalize the same as live '#'
+    src = System.Text.RegularExpressions.Regex.Replace(src, @"#{2,}", "#");
+
     // Keep only a-z, 0-9, space, '#', and '-' (strip punctuation/artifacts)
     src = System.Text.RegularExpressions.Regex.Replace(src, @"[^a-z0-9 #\-]", " ");
 

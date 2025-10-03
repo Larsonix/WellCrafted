@@ -1,119 +1,27 @@
-# WellCrafted Plugin v1.3.0
+# WellCrafted Plugin v1.7.2
 
-A modular ExileCore2 plugin for Path of Exile 2 that analyzes Well of Souls choices, maps visible modifiers to hidden outcomes, provides intelligent scoring with user-configurable profiles, and renders an overlay to help make optimal waystone crafting decisions.
+An ExileCore2 plugin that analyzes Well of Souls choices, maps visible modifiers to hidden outcomes, provides intelligent scoring with user-configurable profiles, and renders an overlay to help make optimal waystone crafting decisions.
 
-## Architecture Overview
 
-This plugin has been completely refactored from a monolithic single-file approach to a clean, modular architecture that follows separation of concerns principles. The new structure makes the codebase maintainable, extensible, and easier to debug.
+## New features in 1.7.2 (since 1.6.3)
 
-## File Structure
+- **Robust choice panel detection**  
+  - Overlay now gates strictly on the actual 3-choices panel visibility (no longer inferred from Reveal button).  
+  - Rectangles must be valid (non-zero size) before overlay draws, eliminating top-left flicker.
 
-```
-Plugins/Source/WellCrafted/
-├── WellCraftedPlugin.cs              # Main plugin entry point & lifecycle
-├── WellCrafted.csproj                # Project file
-├── README.md                         # This file
-│
-├── Settings/
-│   ├── WellCraftedSettings.cs        # Root settings configuration
-│   ├── ProfilesUiSettings.cs         # UI colors, thresholds, table sizing
-│   └── OverlaySettings.cs            # Overlay toggles, font size, position
-│
-├── Profiles/
-│   ├── ProfileModel.cs               # WeightProfile & ProfilesFile models
-│   ├── ProfilesStore.cs              # JSON load/save, schema migration
-│   └── ProfilesService.cs            # CRUD operations, active profile mgmt
-│
-├── Mapping/
-│   ├── HiddenMapping.cs              # Built-in mapping table + utilities
-│   └── HiddenMappingLoader.cs        # External JSON merge + diagnostics
-│
-├── Scoring/
-│   ├── ScoringRules.cs               # Core scoring algorithms & normalization
-│   └── ColorRules.cs                 # Color selection based on thresholds
-│
-├── UI/
-│   ├── PanelRoot.cs                  # Main window controller
-│   ├── ProfilesPanel.cs              # Profiles management UI
-│   └── Tables/
-│       └── WeightsTableRenderer.cs   # ImGui table rendering utilities
-│
-├── Overlay/
-│   └── OverlayRenderer.cs            # In-game overlay rendering
-│
-├── Diagnostics/
-│   └── Logger.cs                     # Centralized logging wrapper
-│
-└── Util/
-    ├── Guard.cs                      # Defensive programming utilities
-    ├── JsonUtil.cs                   # JSON serialization helpers
-    └── ImGuiHelpersEx.cs            # Safe ImGui wrapper patterns
-```
+- **Panel generation tracking**  
+  - Detects when the 3-choices panel is rebuilt (element IDs/rects change).  
+  - Clears caches and restarts detection reliably on every cycle.
 
-## Core Features
+- **Grace window for fast interactions**  
+  - New setting `ChoicesGraceMs` (default 3000 ms).  
+  - During grace, overlay accepts empty text and fills in as choices populate.  
+  - Prevents missed overlays when clicking quickly through Confirm → Reveal cycles.
 
-### 1. **Profile System**
-- Multiple user-configurable profiles with weight preferences
-- Per-panel multipliers for Default/Desecrated/Hidden modifiers
-- Schema versioning with automatic migration from v1 to v2
-- Profile CRUD operations (Create, Rename, Delete, Clone)
-- Automatic backup system (keeps 3 most recent)
+- **Settings**  
+  - `ChoicesGraceMs` exposed in the menu (0–10000 ms).  
+  - Diagnostics/Profiles unchanged.
 
-### 2. **Scoring System**
-- Weight range: -11 to +10 (where -11 = BANNED = negative infinity)
-- Sign-aware panel multipliers: `scaled = weight * (1 + multiplier * sign(weight))`
-- Hidden modifier aggregation (currently average, extensible for min/softmin)
-- Hard veto system: any banned modifier makes choice unpickable
-- Configurable color thresholds for visual feedback
-
-### 3. **Hidden Mapping**
-- Built-in mapping database for visible → hidden modifier relationships
-- External JSON file support for user customizations
-- Fuzzy matching with text normalization
-- Merge system: built-in ← seeds ← user (user has highest priority)
-- Real-time mapping editor with import/export capabilities
-
-### 4. **Overlay System**
-- Compact single-line display: `HiddenMods — Score`
-- Configurable positioning, text size, pixel snapping
-- Hover highlighting and optional visible text echo
-- Score badge with banned/numeric display
-- Debug rectangle visualization
-
-### 5. **UI Components**
-- Clean tabbed interface for Default/Desecrated/Hidden weights
-- Color-coded sliders with "Banned" display for -11 values
-- Row background coloring that matches overlay colors
-- Real-time score preview and threshold visualization
-- Appearance customization (colors, thresholds)
-
-## Key Design Principles
-
-### **Data Safety**
-- Never wipe user profiles during updates
-- Schema migration preserves existing data
-- Automatic backup system before saves
-- Defensive programming with null checks and fallbacks
-
-### **Scoring Consistency**
-- Same color logic used for overlay, sliders, and row backgrounds
-- All text normalization goes through single `ScoringRules.Normalize()` method
-- Banned logic (-11 = negative infinity) enforced consistently
-- Score thresholds user-configurable via settings
-
-### **Modularity**
-- Clear separation between data, business logic, and UI
-- Services communicate through well-defined interfaces
-- Easy to extend with new aggregation methods or automation features
-- Comprehensive error handling with graceful degradation
-
-### **Performance**
-- TimeCache for game state snapshots (100ms refresh)
-- Efficient text normalization with regex compilation
-- Minimal ImGui state management
-- Selective UI updates only when necessary
-
-## Configuration Files
 
 ### **Profiles** (`WellCraftedProfiles.json`)
 ```json
@@ -146,17 +54,65 @@ Plugins/Source/WellCrafted/
 }
 ```
 
-## Future Extensions
-
-The architecture is designed to easily accommodate:
-
-- **Automation Module**: Hotkey-driven reroll automation with safety checks
-- **Advanced Aggregation**: Min, SoftMin(k), weighted average for hidden mods  
-- **CSV Export**: Current filtered view export for external analysis
-- **Test Harness**: Automated scoring invariant verification
-- **Plugin Bridge**: Integration with other ExileCore2 plugins
-
 ## Version History
+
+### 1.7.2
+- Added strict rectangle validity checks to eliminate flicker.
+
+
+### 1.7.1
+- Improved grace handling and overlay stability during rapid clicks.
+
+
+### 1.7.0
+- Panel visibility now keyed to actual 3-choices container.
+- Panel generation flips tracked for reliable rebinds.
+- Grace window setting exposed in menu.
+
+### 1.6.3
+- Normalization finalized with **multi-`#` collapse** (e.g., `1#` ≈ `#`) for reliable matches.
+- Scoring parity for “overrun” combinations (visible weights now apply correctly).
+- Overlay gating refined: draw only when panel **and at least one choice** are ready.
+
+### 1.6.2
+- Loader hardening:
+  - Case-insensitive JSON properties.
+  - Deterministic merge order (built-in ← seeds ← user).
+  - Commit-after-parse to preserve last good data on errors.
+- Diagnostics clarity improved: active paths and mapping counts surfaced.
+
+### 1.6.1
+- Multi-line / combined choice support:
+  - Exact match → per-clause split (newline/semicolon) → safe containment fallback.
+  - Merges results and de-duplicates hidden mods.
+
+### 1.6.0
+- Single-source normalization across the plugin:
+  - Bracket runs keep the visible token.
+  - Alternations `a|b|c` keep the last option.
+  - Numbers → `#`; punctuation/whitespace unified.
+- Profiles and mappings now share the same normalizer.
+
+### 1.5.4
+- Initial overlay gating so rendering happens only when the choice panel is present.
+- Minor overlay polish (debug rectangles, bubble label tuning).
+
+### 1.5.3
+- Data paths clarified; seeds under `Source/WellCrafted/data` (runtime copy handled).
+- Loader reads consistently from the plugin’s `data` folder.
+
+### 1.5.2
+- Diagnostics improvements: **Reload Mappings**, **Export Current**, clearer logs.
+- One-shot logging for unknown hidden keys to aid mapping coverage.
+
+### 1.5.1
+- 100 ms snapshot smoothing to eliminate transient empty frames during fast interactions.
+- Immediate draw preserved (no added delay).
+
+### 1.5.0
+- Baseline modular refactor (core, mapping, scoring, profiles, UI).
+- Overlay with hidden mod lines and scoring.
+- Profiles v2 with backups and per-tab multipliers.
 
 - **v1.3.0**: Complete architectural refactor to multi-file modular design
 - **v1.2.8**: Last stable monolithic version (baseline reference)
