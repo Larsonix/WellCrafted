@@ -114,8 +114,8 @@ An ExileCore2 plugin that analyzes Well of Souls choices, maps visible modifiers
 - Overlay with hidden mod lines and scoring.
 - Profiles v2 with backups and per-tab multipliers.
 
-# **v1.3.0**: Complete architectural refactor to multi-file modular design
-# **v1.2.8**: Last stable monolithic version (baseline reference)
-# **v1.2.x**: Added panel multipliers, banned (-11) logic, schema v2
-# **v1.1.x**: Basic profile system, hidden mapping
-# **v1.0.x**: Initial overlay and scoring system
+#### **v1.3.0**: Complete architectural refactor to multi-file modular design
+#### **v1.2.8**: Last stable monolithic version (baseline reference)
+#### **v1.2.x**: Added panel multipliers, banned (-11) logic, schema v2
+#### **v1.1.x**: Basic profile system, hidden mapping
+#### **v1.0.x**: Initial overlay and scoring system
