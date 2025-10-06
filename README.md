@@ -1,9 +1,9 @@
-# WellCrafted Plugin v1.8.0
+# WellCrafted Plugin v1.8.1
 
 An ExileCore2 plugin that analyzes Well of Souls choices, maps visible modifiers to hidden outcomes, provides intelligent scoring with user-configurable profiles, and renders an overlay to help make optimal waystone crafting decisions.
 
 
-## New features in 1.8.0 (since 1.6.3)
+## New features in 1.8.1 (since 1.6.3)
 
 - **Favorite weights (NEW)**  
   - Add `+11 = Favorite` for any weight (Visible: Default/Desecrated, or Hidden).  
@@ -61,6 +61,10 @@ An ExileCore2 plugin that analyzes Well of Souls choices, maps visible modifiers
 ```
 
 ## Version History
+
+### 1.8.1
+- Changed Profile Settings so the background is Yellow if the weight is "Favorite"
+- Changed some bugged text for better comprehension
 
 ### 1.8.0
 - Favorite weight added: +11 shows a yellow FAVORITE badge and overrides all other checks (including BANNED).

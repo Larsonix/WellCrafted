@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing; // for Color.FromArgb
 using ImGuiNET;
 using WellCrafted.Settings;
 using WellCrafted.Profiles;
@@ -25,7 +26,7 @@ namespace WellCrafted.UI.Tables
 
         public void RenderWeightsTable(string category, List<string> modifiers)
         {
-            ImGui.Text($"{category} Weights (-11=BANNED, -10..+11; step 1)");
+            ImGui.Text($"{category} Weights (-11 = Banned | +11 = Favorite)");
 
             var flags = ImGuiTableFlags.RowBg | ImGuiTableFlags.BordersInnerV |
                         ImGuiTableFlags.ScrollY | ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingStretchProp;
@@ -57,8 +58,21 @@ namespace WellCrafted.UI.Tables
             float cur = 0f;
             dict?.TryGetValue(normKey, out cur);
 
-            ImGui.TableSetBgColor(ImGuiTableBgTarget.RowBg0,
-                ColorRules.GetRowBackgroundColor(cur, _settings.ProfilesUI));
+            // Row background:
+            // - If FAVORITE (+11), tint the row with Favorite color (soft alpha).
+            // - Otherwise, use the standard background based on thresholds.
+            uint rowBg;
+            if (ScoringRules.IsWeightFavorite(cur))
+            {
+                var fav = _settings.ProfilesUI.FavoriteWeightColor.Value;
+                var favA = Color.FromArgb(36, fav.R, fav.G, fav.B); // soft alpha, matches other rows
+                rowBg = ColorRules.ToU32(favA);
+            }
+            else
+            {
+                rowBg = ColorRules.GetRowBackgroundColor(cur, _settings.ProfilesUI);
+            }
+            ImGui.TableSetBgColor(ImGuiTableBgTarget.RowBg0, rowBg);
 
             ImGui.TableSetColumnIndex(0);
             ImGui.TextUnformatted(modifier);
@@ -76,7 +90,7 @@ namespace WellCrafted.UI.Tables
 
             if (ImGui.SliderInt("##w", ref v, ScoringRules.BANNED_WEIGHT, ScoringRules.FAVORITE_WEIGHT, fmt, ImGuiSliderFlags.AlwaysClamp))
             {
-                // Edit only in memory; user explicitly saves
+                // Edit only in memory to avoid snap; user saves explicitly
                 _profiles.UpdateWeight(category, normKey, v, save: false);
             }
 
